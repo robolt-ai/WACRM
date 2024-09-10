@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Meta -->
+    <meta name="description" content="">
+    <meta name="author" content="Themepixels">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/dist/assets/img/favicon.png">
+
+    <title>WACRM - Premium Dashboard Template</title>
+
+    <!-- Vendor CSS -->
+    <link rel="stylesheet" href="/dist/lib/remixicon/fonts/remixicon.css">
+
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="/dist/assets/css/style.min.css">
+  </head>
+  <body class="page-sign">
+
+    <div class="card card-sign">
+      <div class="card-header">
+        <a href="/" class="header-logo mb-4">WACRM</a>
+        <h3 class="card-title">Sign In</h3>
+        <p class="card-text">Welcome back! Please signin to continue.</p>
+      </div><!-- card-header -->
+      <div class="card-body">
+        <form action="" id="login">
+        <div class="mb-4">
+          <label class="form-label">Email address</label>
+          <input type="text" name="userEmail" class="form-control" placeholder="Enter your email address">
+        </div>
+        <div class="mb-4">
+          <label class="form-label d-flex justify-content-between">Password <a href="">Forgot password?</a></label>
+          <input type="password" name="userPassword" class="form-control" placeholder="Enter your password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-sign">Sign In</button>
+      </form>
+
+        
+      </div><!-- card-body -->
+     
+    </div><!-- card -->
+
+    <script src="/dist/lib/jquery/jquery.min.js"></script>
+    <script src="/dist/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+      'use script'
+
+      var skinMode = localStorage.getItem('skin-mode');
+      if(skinMode) {
+        $('html').attr('data-skin', 'dark');
+      }
+
+    </script>
+
+<script>
+  const form = document.getElementById("login");
+  const submitButton = form.querySelector('button[type="submit"]');
+  const errorMessage = form.querySelector(".error-message");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault(); // Prevent the form from submitting
+    submitButton.disabled = true; // Disable the submit button
+    submitButton.textContent = "Loading..."; // Change the text of the submit button to "Loading..."
+
+    const userEmail = form.userEmail.value;
+    const userPassword = form.userPassword.value;
+
+    // Make the API call to login
+    const response = await fetch("/api/v1/auth/user-signIn", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userEmail, userPassword }),
+    });
+
+    submitButton.disabled = false; // Enable the submit button
+    submitButton.textContent = "Log in";
+
+    if (response.ok) {
+      // Handle successful login
+      const data = await response.json();
+      console.log(data);
+
+      // Redirect to the home page
+      window.location.href = "/";
+    } else {
+      // Handle failed login
+      const errorData = await response.json();
+      errorMessage.textContent = errorData.message;
+    }
+  });
+</script>
+  </body>
+</html>

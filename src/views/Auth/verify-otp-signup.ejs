@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Login V1</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="images/icons/favicon.ico" />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="vendor/bootstrap/css/bootstrap.min.css"
+    />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="fonts/font-awesome-4.7.0/css/font-awesome.min.css"
+    />
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css" />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="vendor/css-hamburgers/hamburgers.min.css"
+    />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="vendor/select2/select2.min.css"
+    />
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="css/util.css" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <!--===============================================================================================-->
+  </head>
+  <body>
+    <div class="limiter">
+      <div class="container-login100">
+        <div class="wrap-login100">
+          <div class="login100-pic js-tilt" data-tilt>
+            <img src="images/img-01.png" alt="IMG" />
+          </div>
+
+          <form class="login100-form validate-form" id="otp-verify-form">
+            <span class="login100-form-title"> Member Verify OTP </span>
+
+            <div
+              class="wrap-input100 validate-input"
+              data-validate="Valid OTP is required"
+            >
+              <input
+                class="input100"
+                type="text"
+                id="otp"
+                name="otp"
+                placeholder="OTP"
+              />
+              <span class="focus-input100"></span>
+              <span class="symbol-input100">
+                <i class="fa fa-key" aria-hidden="true"></i>
+              </span>
+            </div>
+
+            <div class="container-login100-form-btn">
+              <button class="login100-form-btn" type="submit">Submit</button>
+            </div>
+
+            <div class="text-center p-t-12">
+              <!-- <span class="txt1"> Forgot </span> -->
+              <p id="resendButton" style="cursor: pointer">Resend OTP</p>
+            </div>
+
+            <p class="error-message text-danger text-center mt-2"></p>
+
+            <div class="text-center p-t-136">
+              <a class="txt2" href="/register">
+                Create your Account
+                <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("otp-verify-form")
+      const submitButton = form.querySelector('button[type="submit"]')
+      const errorMessage = form.querySelector(".error-message")
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault() // Prevent the form from submitting
+
+        submitButton.disabled = true // Disable the submit button
+        submitButton.textContent = "Loading..." // Change the text of the submit button to "Loading..."
+
+        const otp = form.otp.value
+
+        // Get the token from the cookie
+        const token = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("token="))
+          .split("=")[1]
+
+        // Make the API call to verify the OTP
+        const response = await fetch("/api/v1/signUp-verfiy-otp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ otp }),
+        })
+
+        submitButton.disabled = false // Enable the submit button
+        submitButton.textContent = "Confirm"
+
+        if (response.ok) {
+          // Handle successful login
+          const data = await response.json()
+          console.log("OTP verification successful:", data)
+
+          // Redirect to the home page
+          window.location.href = "/my-profile-creation"
+        } else {
+          // Handle failed login
+          const errorData = await response.json()
+          console.log(errorData)
+          console.error("Registration failed:", errorData)
+          errorMessage.textContent = errorData.message
+        }
+      })
+    </script>
+
+    <script>
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        .split("=")[1]
+
+      const resendButton = document.getElementById("resendButton")
+      resendButton.addEventListener("click", async (e) => {
+        e.preventDefault() // Prevent the form from submitting
+
+        resendButton.disabled = true
+        resendButton.textContent = "Loading..."
+
+        // Make the API call to resend the OTP
+        const response = await fetch("/api/v1/resend-otp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        resendButton.disabled = false
+        resendButton.textContent = "Loading..."
+
+        if (response.ok) {
+          // Handle successful OTP resend
+          const data = await response.json()
+          console.log("OTP resend successful:", data)
+
+          setTimeout(() => {
+            // Redirect to the OTP verification page
+            window.location.href = "/verify-otp-forget-password"
+          }, 1500)
+        } else {
+          // Handle failed OTP resend
+          const errorData = await response.json()
+          console.log(errorData)
+          console.error("OTP resend failed:", errorData)
+
+          // You might want to display an error message to the user
+        }
+
+        resendButton.disabled = false
+        resendButton.textContent = "Resend OTP"
+      })
+    </script>
+    <!--===============================================================================================-->
+    <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="vendor/bootstrap/js/popper.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="vendor/select2/select2.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="vendor/tilt/tilt.jquery.min.js"></script>
+    <script>
+      $(".js-tilt").tilt({
+        scale: 1.1,
+      })
+    </script>
+    <!--===============================================================================================-->
+    <script src="js/main.js"></script>
+  </body>
+</html>
