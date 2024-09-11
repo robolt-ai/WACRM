@@ -66,46 +66,6 @@ module.exports = function (viewPage) {
     res.render("Dashboard/reset-password-page");
   });
 
-  //Expense
-  viewPage.get("/expense-list", isUserAllowed, function (req, res) {
-    res.render("Dashboard/Expense/expense-list");
-  });
-
-  viewPage.get("/expense-category-list", isUserAllowed, function (req, res) {
-    res.render("Dashboard/Expense/expense-category-list");
-  });
-
-  //Income
-  viewPage.get("/income-list", isUserAllowed, function (req, res) {
-    res.render("Dashboard/Income/income-list");
-  });
-
-  viewPage.get("/income-category-list", isUserAllowed, function (req, res) {
-    res.render("Dashboard/Income/income-category-list");
-  });
-
-  //Employee
-
-  //Staff
-
-  viewPage.get("/staff-list", isUserAllowed, function (req, res) {
-    res.render("Dashboard/Staff management/staff-list");
-  });
-
-  viewPage.get("/user-group-list", isUserAllowed, function (req, res) {
-    res.render("Dashboard/Staff management/user-group-list");
-  });
-
-  viewPage.get("/user-group-list", isUserAllowed, function (req, res) {
-    res.render("Dashboard/Staff management/create-user-group");
-  });
-
-  viewPage.get("/member-list-paid", isUserAllowed, function (req, res) {
-    res.render("Dashboard/Member ship/member-list-paid");
-  });
-  viewPage.get("/member-list-unpaid", isUserAllowed, function (req, res) {
-    res.render("Dashboard/Member ship/member-list-unpaid");
-  });
 
   /////////////////////////////////////////////////////////
 

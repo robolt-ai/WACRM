@@ -4,8 +4,8 @@ const jwt = require("jsonwebtoken");
 const userModel = require("../../models/user");
 const userSignUp = async function (req, res) {
   try {
-    let userEmail = "ak5913755@gmail.com";
-    let userPassword = "Aman@123#";
+    let userEmail = "admin@gmail.com";
+    let userPassword = "Admin@123#";
     const existingUser = await userModel.findOne({
       userEmail: userEmail.toLowerCase(),
       isVerified: true,
