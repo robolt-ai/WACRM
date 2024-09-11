@@ -66,6 +66,11 @@ module.exports = function (viewPage) {
     res.render("Dashboard/reset-password-page");
   });
 
+  //subscriptions
+  viewPage.get("/subscriptions", isUserAllowed, function (req, res) {
+    res.render("Dashboard/subscriptions");
+  });
+
 
   /////////////////////////////////////////////////////////
 

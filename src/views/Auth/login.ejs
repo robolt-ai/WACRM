@@ -40,7 +40,11 @@
           <input type="password" name="userPassword" class="form-control" placeholder="Enter your password">
         </div>
         <button type="submit" class="btn btn-primary btn-sign">Sign In</button>
+
+        <p class="error-message text-danger text-center mt-4"></p>
       </form>
+
+     
 
         
       </div><!-- card-body -->
@@ -94,6 +98,7 @@
     } else {
       // Handle failed login
       const errorData = await response.json();
+      console.log(errorData)
       errorMessage.textContent = errorData.message;
     }
   });

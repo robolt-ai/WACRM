@@ -1,0 +1,105 @@
+<%- include('../partials/header.ejs') %>
+
+  <div class="main main-app p-3 p-lg-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="main-title mb-0">Manage Subscription</h4>
+      </div>
+      <div>
+        <a href="#modal2" class="btn btn-primary" data-bs-toggle="modal">Create new subscription</a>
+        
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-12 col-xl-12">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Subscription name</th>
+              <th scope="col">Orders per day </th>
+              <th scope="col">Subscription validity</th>
+              <th scope="col">Subscription prices</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">1</th>
+              <td>Adrian Monino</td>
+              <td>Front-End Engineer</td>
+              <td>Computer Science</td>
+              <td>$120,000</td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>Socrates Itumay</td>
+              <td>Software Engineer</td>
+              <td>Computer Engineering</td>
+              <td>$150,000</td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>Reynante Labares</td>
+              <td>Product Manager</td>
+              <td>Business Management</td>
+              <td>$250,000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div><!-- col -->
+    </div><!-- row -->
+  </div><!-- main -->
+
+
+  <div class="modal fade" id="modal2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create new subscription</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div><!-- modal-header -->
+        <div class="modal-body">
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">Subscription name</label>
+              <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Subscription name">
+            </div>
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">Orders per day</label>
+              <input type="number" class="form-control" id="exampleFormControlInput1" placeholder="Enter in numerical format">
+            </div>
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">Subscription validity</label>
+              <input type="number" class="form-control" id="exampleFormControlInput1" placeholder="Subscription validity">
+            </div>
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">Subscription prices</label>
+              <input type="number" class="form-control" id="exampleFormControlInput1" placeholder="Subscription prices">
+            </div>
+            
+            
+          </div><!-- card-body -->
+        </div><!-- modal-body -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Submit</button>
+        </div><!-- modal-footer -->
+      </div><!-- modal-content -->
+    </div><!-- modal-content -->
+  </div><!-- modal -->
+
+  </div>
+
+
+<script>
+  $("#tableGrid2").Grid({
+  className: {
+    table: 'table table-bordered mb-0'
+  },
+  pagination: true
+});
+</script>
+<!-- Content Wrapper END -->
+<%- include('../partials/footer') %>
+</html>
