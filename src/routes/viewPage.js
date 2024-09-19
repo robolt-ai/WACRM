@@ -71,6 +71,19 @@ module.exports = function (viewPage) {
     res.render("Dashboard/subscriptions");
   });
 
+  viewPage.get("/users", isUserAllowed, function (req, res) {
+    res.render("Dashboard/users");
+  });
+  viewPage.get("/orders", isUserAllowed, function (req, res) {
+    res.render("Dashboard/orders");
+  });
+  viewPage.get("/category", isUserAllowed, function (req, res) {
+    res.render("Dashboard/category");
+  });
+  viewPage.get("/category", isUserAllowed, function (req, res) {
+    res.render("Dashboard/category");
+  });
+
 
   /////////////////////////////////////////////////////////
 

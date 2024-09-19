@@ -1,0 +1,81 @@
+<%- include('../partials/header.ejs') %>
+
+  <div class="main main-app p-3 p-lg-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="main-title mb-0">Create/View categories</h4>
+      </div>
+      <div>
+        <a href="#modal2" class="btn btn-primary" data-bs-toggle="modal">Create new category</a>
+        
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-12 col-xl-12">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Category ID</th>
+              <th scope="col">Category Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">1</th>
+              <td>Grocery</td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>Staples</td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>Beverages</td>
+            </tr>
+          </tbody>
+        </table>
+      </div><!-- col -->
+    </div><!-- row -->
+  </div><!-- main -->
+
+
+  <div class="modal fade" id="modal2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create new category</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div><!-- modal-header -->
+        <div class="modal-body">
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">Category name</label>
+              <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Enter category name">
+            </div>
+            
+            
+          </div><!-- card-body -->
+        </div><!-- modal-body -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Submit</button>
+        </div><!-- modal-footer -->
+      </div><!-- modal-content -->
+    </div><!-- modal-content -->
+  </div><!-- modal -->
+
+  </div>
+
+
+<script>
+  $("#tableGrid2").Grid({
+  className: {
+    table: 'table table-bordered mb-0'
+  },
+  pagination: true
+});
+</script>
+<!-- Content Wrapper END -->
+<%- include('../partials/footer') %>
+</html>
