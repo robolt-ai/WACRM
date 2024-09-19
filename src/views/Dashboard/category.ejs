@@ -43,6 +43,7 @@
   <div class="modal fade" id="modal2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
+        <form action="" id="category-form">
         <div class="modal-header">
           <h5 class="modal-title">Create new category</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -50,8 +51,8 @@
         <div class="modal-body">
           <div class="card-body">
             <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">Category name</label>
-              <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Enter category name">
+              <label for="category_name" class="form-label">Category name</label>
+              <input type="text" class="form-control" id="category_name" placeholder="Enter category name">
             </div>
             
             
@@ -59,8 +60,9 @@
         </div><!-- modal-body -->
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
         </div><!-- modal-footer -->
+      </form>
       </div><!-- modal-content -->
     </div><!-- modal-content -->
   </div><!-- modal -->
@@ -76,6 +78,277 @@
   pagination: true
 });
 </script>
+
+
+
+<Script>
+
+  const token = document.cookie
+  .split("; ")
+  .find((row) => row.startsWith("token="))
+  .split("=")[1]
+  
+  
+  const expense_category =  async()=>{
+  try {
+  // Make an API call to get-category (replace with your actual API endpoint)
+  const response = await fetch("/api/v1/expense-category/get-expense-category", {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
+  })
+  
+  if (response.ok) {
+  // Handle successful login
+  const data = await response.json()
+  
+  console.log(data)
+  
+  if (data.data.length === 0) {
+    return  document.getElementById("display-invoice-list").innerHTML = `<tr>
+                <td>
+                    No data available.
+                </td>
+  
+            </tr>`
+  }
+  
+  let res = data.data.map((item,index)=>{
+    return `<tr>
+  
+                <td>
+                    #${index+1}
+                </td>
+                <td>
+  
+                  <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center">
+                    <h6 class="m-l-10 m-b-0">${item.category_name}</h6>
+                  </div>
+                </div>
+  
+                </td>
+  
+  
+                <td class="text-left">
+                  <button class="btn btn-icon btn-hover btn-sm btn-rounded pull-right">
+                  <i class="anticon anticon-edit" data-toggle="modal"
+                      data-target="#edit-expense-category" onClick="getExpenseCategoryDetails('${item._id}')"></i>
+                  </button>
+  
+                    <button class="btn btn-icon btn-hover btn-sm btn-rounded"onClick="deleteExpenseCategory('${item._id}')">
+                        <i class="anticon anticon-delete"></i>
+                    </button>
+                </td>
+            </tr>`
+  }).join("")
+  
+  document.getElementById("display-invoice-list").innerHTML = res
+  
+  } else {
+    alert("erro")
+  }
+  
+  
+  } catch (error) {
+  console.error('Error:', error);
+  }
+  }
+  
+  window.onload = expense_category();
+  </Script>
+  
+  <!-- delete expense -->
+  <script>
+  async function deleteExpenseCategory(id){
+  try {
+  const token = document.cookie
+  .split('; ')
+  .find((row) => row.startsWith('token='))
+  .split('=')[1];
+  
+  const response = await swal({
+  title: 'Are you sure you want to delete?',
+  text: 'This action cannot be undone.',
+  icon: 'warning',
+  buttons: ['Cancel', 'Delete'],
+  dangerMode: true,
+  });
+  
+  if (response) {
+  if (response) {
+  const deleteResponse = await fetch(`/api/v1/expense-category/delete-expense-category/${id}`, {
+  method: 'DELETE',
+  headers: {
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${token}`,
+  },
+  });
+  
+  const data = await deleteResponse.json();
+  if (deleteResponse.ok) {
+  swal({
+      title: 'Deleted!',
+      text: `${data.message}`,
+      icon: 'success',
+      }).then(() => {
+        // Automatically trigger the "Close" button click event to close the modal
+        // document.getElementById("closeModalButton").click();
+        expense_category();
+      });
+  
+  } else {
+  // Handle deletion error
+  swal('Error', `${data.message}`, 'error');
+  }
+  }
+  }
+  } catch (error) {
+  console.error('Error:', error);
+  }
+  }
+  </script>
+  
+  <!-- create category -->
+  <script>
+    let form;
+  form = document.getElementById("category-form")
+  
+  submitButton = form.querySelector('button[type="submit"]')
+  errorMessage = form.querySelector(".error-message")
+  
+  
+  
+  
+  form.addEventListener("submit", async (e) => {
+  e.preventDefault() // Prevent the form from submitting
+  submitButton.disabled = true // Disable the submit button
+  submitButton.textContent = "Loading..." // Change the text of the submit button to "Loading..."
+  const category_name = document.getElementById("category_name").value.trim()
+  
+  console.log(form)
+  
+  // Make the API call to login
+  const response = await fetch("/api/v1/category/create-category", {
+  method: "POST",
+  headers: {
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify({
+  category_name,
+  
+  
+  }),
+  })
+  
+  submitButton.disabled = false // Enable the submit button
+  submitButton.textContent = "Submit" // Change the text of the submit button back to "Submit"
+  
+  if (response.ok) {
+  // Handle successful login
+  const data = await response.json()
+  // Redirect to the home page
+  swal({
+      title: 'Submited!',
+      text: `${data.message}`,
+      icon: 'success',
+      }).then(() => {
+        // Automatically trigger the "Close" button click event to close the modal
+        // document.getElementById("closeModalButton").click();
+        // expense_category();
+      });
+  } else {
+  // Handle failed registration
+  const errorData = await response.json()
+  console.log(errorData)
+  errorMessage.textContent = errorData.message
+  }
+  })
+  </script>
+  
+  
+  <script>
+    let ex_category_id;
+    async function getExpenseCategoryDetails(id){
+    try {
+        ex_category_id = id
+    const token = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('token='))
+    .split('=')[1];
+  
+    const response = await fetch(`/api/v1/expense-category/get-or-update-expense-category/${id}`, {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+        category_type:"getCategory",
+        }),
+    });
+  
+    if (response.ok) {
+    // Handle successful login
+    const data = await response.json();
+    console.log(data)
+    document.getElementById("up_ex_category_name").value = data.data.category_name
+  
+    } else {
+    // Handle login error
+    swal('Error', 'Failed to get the category.', 'error');
+    }
+    } catch (error) {
+    console.error('Error:', error);
+    }
+    }
+  
+  
+  </script>
+  <!-- update-category -->
+  <script>
+      async function updateExpenseCategoryPost(){
+      // const userName = form.userName.value
+      const category_name = document.getElementById("up_category_name").value.trim()
+      // Make the API call to login
+      const response = await fetch(`/api/v1/expense-category/get-or-update-expense-category/${ex_category_id}`, {
+      method: "POST",
+      headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+          category_type:"updated",
+          category_name,
+  
+      }),
+      })
+  
+      if (response.ok) {
+      // Handle successful login
+      const data = await response.json()
+  
+      swal({
+      title: 'Updated!',
+      text: `${data.message}`,
+      icon: 'success',
+      }).then(() => {
+        // Automatically trigger the "Close" button click event to close the modal
+        document.getElementById("editCloseModalButton").click();
+        expense_category();
+      });
+  
+      } else {
+      // Handle failed registration
+      const errorData = await response.json()
+      console.log(errorData)
+      errorMessage.textContent = errorData.message
+      }
+      }
+  </script>
 <!-- Content Wrapper END -->
 <%- include('../partials/footer') %>
 </html>

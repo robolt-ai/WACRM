@@ -8,7 +8,7 @@ const schema = new mongoose.Schema(
       required: true,
       trim: true, // removes whitespace from both ends of a string
     },
-    subscriptions_type: {
+    max_order_per_day: {
       type: String,
       required: true,
       trim: true,
