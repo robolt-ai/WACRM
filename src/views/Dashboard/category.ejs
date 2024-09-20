@@ -20,19 +20,9 @@
               <th scope="col">Category Name</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Grocery</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Staples</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Beverages</td>
-            </tr>
+          <tbody id="display-invoice-list">
+            
+            
           </tbody>
         </table>
       </div><!-- col -->
@@ -92,7 +82,7 @@
   const expense_category =  async()=>{
   try {
   // Make an API call to get-category (replace with your actual API endpoint)
-  const response = await fetch("/api/v1/expense-category/get-expense-category", {
+  const response = await fetch("/api/v1/category/get-category", {
   method: "GET",
   headers: {
     "Content-Type": "application/json",
@@ -116,33 +106,27 @@
   }
   
   let res = data.data.map((item,index)=>{
-    return `<tr>
+    return `
+
+              <tr>
+              <th scope="row"> #${index+1}</th>
+              <td>${item.category_name}</td>
+              <td>  <button class="btn btn-primary btn-hover btn-sm btn-rounded"onClick="deleteExpenseCategory('${item._id}')">
+                       Remove
+                    </button></td>
+
+            </tr>
+    
+    
   
-                <td>
-                    #${index+1}
-                </td>
-                <td>
+               
   
-                  <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-center">
-                    <h6 class="m-l-10 m-b-0">${item.category_name}</h6>
-                  </div>
-                </div>
+                
   
-                </td>
+                
   
-  
-                <td class="text-left">
-                  <button class="btn btn-icon btn-hover btn-sm btn-rounded pull-right">
-                  <i class="anticon anticon-edit" data-toggle="modal"
-                      data-target="#edit-expense-category" onClick="getExpenseCategoryDetails('${item._id}')"></i>
-                  </button>
-  
-                    <button class="btn btn-icon btn-hover btn-sm btn-rounded"onClick="deleteExpenseCategory('${item._id}')">
-                        <i class="anticon anticon-delete"></i>
-                    </button>
-                </td>
-            </tr>`
+                  
+                `
   }).join("")
   
   document.getElementById("display-invoice-list").innerHTML = res
@@ -179,7 +163,7 @@
   
   if (response) {
   if (response) {
-  const deleteResponse = await fetch(`/api/v1/expense-category/delete-expense-category/${id}`, {
+  const deleteResponse = await fetch(`/api/v1/category/delete-category/${id}`, {
   method: 'DELETE',
   headers: {
   'Content-Type': 'application/json',

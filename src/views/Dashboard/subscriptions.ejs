@@ -23,28 +23,8 @@
               <th scope="col">Subscription prices</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Free</td>
-              <td>3</td>
-              <td>No expiry</td>
-              <td>Rs.0</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Starter pack</td>
-              <td>15</td>
-              <td>30 Days</td>
-              <td>Rs.85</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Flexi pack Months</td>
-              <td>15</td>
-              <td>60 Days</td>
-              <td>Rs.125</td>
-            </tr>
+          <tbody id="display-invoice-list">
+            
           </tbody>
         </table>
       </div><!-- col -->
@@ -59,23 +39,24 @@
           <h5 class="modal-title">Create new subscription</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div><!-- modal-header -->
+        <form id="subscriptions-form">
         <div class="modal-body">
           <div class="card-body">
             <div class="mb-3">
               <label for="exampleFormControlInput1" class="form-label">Subscription name</label>
-              <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Enter subscription name">
+              <input type="text" id="subscriptions_name" class="form-control"  placeholder="Enter subscription name">
             </div>
             <div class="mb-3">
               <label for="exampleFormControlInput1" class="form-label">Max accepted orders per day</label>
-              <input type="number" class="form-control" id="exampleFormControlInput1" placeholder="Maximum orders a user can place in a day">
+              <input type="number" class="form-control" id="max_order_per_day" placeholder="Maximum orders a user can place in a day">
             </div>
             <div class="mb-3">
               <label for="exampleFormControlInput1" class="form-label">Subscription validity</label>
-              <input type="number" class="form-control" id="exampleFormControlInput1" placeholder="Enter subscription validity in days">
+              <input type="number" id="subscriptions_validity" class="form-control" placeholder="Enter subscription validity in days">
             </div>
             <div class="mb-3">
               <label for="exampleFormControlInput1" class="form-label">Subscription price</label>
-              <input type="number" class="form-control" id="exampleFormControlInput1" placeholder="Enter subscription price">
+              <input type="number" id="subscriptions_price" class="form-control" placeholder="Enter subscription price">
             </div>
             
             
@@ -83,8 +64,9 @@
         </div><!-- modal-body -->
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
         </div><!-- modal-footer -->
+      </form>
       </div><!-- modal-content -->
     </div><!-- modal-content -->
   </div><!-- modal -->
@@ -100,6 +82,270 @@
   pagination: true
 });
 </script>
+
+<Script>
+
+  const token = document.cookie
+  .split("; ")
+  .find((row) => row.startsWith("token="))
+  .split("=")[1]
+  
+  
+  const expense_category =  async()=>{
+  try {
+  // Make an API call to get-subscriptions (replace with your actual API endpoint)
+  const response = await fetch("/api/v1/subscriptions/get-subscriptions", {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
+  })
+  
+  if (response.ok) {
+  // Handle successful login
+  const data = await response.json()
+  
+  console.log(data)
+  
+  if (data.data.length === 0) {
+    return  document.getElementById("display-invoice-list").innerHTML = `<tr>
+                <td>
+                    No data available.
+                </td>
+  
+            </tr>`
+  }
+  
+  let res = data.data.map((item,index)=>{
+    return `
+
+              
+
+            <tr>
+              <th scope="row">${index + 1}</th>
+              <td>${item.subscriptions_name}</td>
+              <td>${item.max_order_per_day}</td>
+              <td>${item.subscriptions_validity}</td>
+              <td>${item.subscriptions_price}</td>
+               <td>  <button class="btn btn-primary btn-hover btn-sm btn-rounded"onClick="deleteExpenseCategory('${item._id}')">
+                       Remove
+                    </button></td>
+            </tr>
+    
+     
+                  
+                `
+  }).join("")
+  
+  document.getElementById("display-invoice-list").innerHTML = res
+  
+  } else {
+    alert("erro")
+  }
+  
+  
+  } catch (error) {
+  console.error('Error:', error);
+  }
+  }
+  
+  window.onload = expense_category();
+  </Script>
+  
+  <!-- delete expense -->
+  <script>
+  async function deleteExpenseCategory(id){
+  try {
+  const token = document.cookie
+  .split('; ')
+  .find((row) => row.startsWith('token='))
+  .split('=')[1];
+  
+  const response = await swal({
+  title: 'Are you sure you want to delete?',
+  text: 'This action cannot be undone.',
+  icon: 'warning',
+  buttons: ['Cancel', 'Delete'],
+  dangerMode: true,
+  });
+  
+  if (response) {
+  if (response) {
+  const deleteResponse = await fetch(`/api/v1/subscriptions/delete-subscriptions/${id}`, {
+  method: 'DELETE',
+  headers: {
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${token}`,
+  },
+  });
+  
+  const data = await deleteResponse.json();
+  if (deleteResponse.ok) {
+  swal({
+      title: 'Deleted!',
+      text: `${data.message}`,
+      icon: 'success',
+      }).then(() => {
+        // Automatically trigger the "Close" button click event to close the modal
+        // document.getElementById("modal2").click();
+        expense_category();
+      });
+  
+  } else {
+  // Handle deletion error
+  swal('Error', `${data.message}`, 'error');
+  }
+  }
+  }
+  } catch (error) {
+  console.error('Error:', error);
+  }
+  }
+  </script>
+  
+  <!-- create subscriptions -->
+  <script>
+    let form;
+  form = document.getElementById("subscriptions-form")
+  
+  submitButton = form.querySelector('button[type="submit"]')
+  errorMessage = form.querySelector(".error-message")
+  
+  
+  
+  
+  form.addEventListener("submit", async (e) => {
+  e.preventDefault() // Prevent the form from submitting
+  submitButton.disabled = true // Disable the submit button
+  submitButton.textContent = "Loading..." // Change the text of the submit button to "Loading..."
+  const subscriptions_name = document.getElementById("subscriptions_name").value.trim()
+  const max_order_per_day = document.getElementById("max_order_per_day").value.trim()
+  const subscriptions_validity = document.getElementById("subscriptions_validity").value.trim()
+  const subscriptions_price = document.getElementById("subscriptions_price").value.trim()
+  
+  console.log(form)
+  
+  // Make the API call to login
+  const response = await fetch("/api/v1/subscriptions/create-subscriptions", {
+  method: "POST",
+  headers: {
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify({
+    subscriptions_name,
+    max_order_per_day,
+    subscriptions_validity,
+    subscriptions_price
+  }),
+  })
+  
+  submitButton.disabled = false // Enable the submit button
+  submitButton.textContent = "Submit" // Change the text of the submit button back to "Submit"
+  
+  if (response.ok) {
+  // Handle successful login
+  const data = await response.json()
+  // Redirect to the home page
+  swal({
+      title: 'Submited!',
+      text: `${data.message}`,
+      icon: 'success',
+      }).then(() => {
+        // Automatically trigger the "Close" button click event to close the modal
+        document.getElementById("modal2").click();
+        expense_category();
+      });
+  } else {
+  // Handle failed registration
+  const errorData = await response.json()
+  console.log(errorData)
+  errorMessage.textContent = errorData.message
+  }
+  })
+  </script>
+  
+  
+  <script>
+    let ex_category_id;
+    async function getExpenseCategoryDetails(id){
+    try {
+        ex_category_id = id
+    const token = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('token='))
+    .split('=')[1];
+  
+    const response = await fetch(`/api/v1/expense-subscriptions/get-or-update-expense-subscriptions/${id}`, {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+        category_type:"getCategory",
+        }),
+    });
+  
+    if (response.ok) {
+    // Handle successful login
+    const data = await response.json();
+    console.log(data)
+    document.getElementById("up_ex_category_name").value = data.data.category_name
+  
+    } else {
+    // Handle login error
+    swal('Error', 'Failed to get the subscriptions.', 'error');
+    }
+    } catch (error) {
+    console.error('Error:', error);
+    }
+    }
+  
+  
+  </script>
+  <!-- update-subscriptions -->
+  <script>
+      async function updateExpenseCategoryPost(){
+      // const userName = form.userName.value
+      const category_name = document.getElementById("up_category_name").value.trim()
+      // Make the API call to login
+      const response = await fetch(`/api/v1/expense-subscriptions/get-or-update-expense-subscriptions/${ex_category_id}`, {
+      method: "POST",
+      headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+          category_type:"updated",
+          category_name,
+  
+      }),
+      })
+  
+      if (response.ok) {
+      // Handle successful login
+      const data = await response.json()
+  
+      swal({
+      title: 'Updated!',
+      text: `${data.message}`,
+      icon: 'success',
+      }).then(() => {
+        // Automatically trigger the "Close" button click event to close the modal
+        document.getElementById("editCloseModalButton").click();
+        expense_category();
+      });
+  
+      } else {
+      // Handle failed registration
+      const errorData = await response.json()
+      console.log(errorData)
+      errorMessage.textContent = errorData.message
+      }
+      }
+  </script>
 <!-- Content Wrapper END -->
 <%- include('../partials/footer') %>
 </html>
