@@ -63,7 +63,6 @@ exports.getAllSubscriptions  = async (req, res) => {
   }
 };
 
-
 exports.deleteSubscriptions = async (req, res) => {
   try {
     const token =
