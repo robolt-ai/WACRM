@@ -16,7 +16,19 @@ exports.createOrder = async (req, res) => {
     
     // req.body.user_id = userId;
 
-    let isOrder = await Order.create(req.body);
+    console.log(req.body)
+
+    let isOrder = await Order.create({
+      customer_name: req.body.name,
+      customer_email: "johndoe@example.com",
+      customer_contact: req.body.MobileNumber,
+      customer_address: req.body.UserAddress,
+      order_type: req.body.categoryselect,
+      order_date: new Date(),
+      order_amount: "100.50",
+      order_status: "pending"
+    }
+    );
 
     if (!isOrder) {
       return res.status(404).send({
