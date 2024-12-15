@@ -48,6 +48,7 @@ const schema = new mongoose.Schema(
       type: String,
     //   required: true,
       trim: true,
+      enum: ["pending", "packed" , "out_for_delivery", "delivered"],
     },
   },
   {

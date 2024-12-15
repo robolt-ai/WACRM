@@ -214,11 +214,15 @@ exports.getOrderDetailsOrUpdate = async (req, res) => {
         });
       }
 
+      // ["pending", "packed" , "out_for_delivery", "delivered"]
+
+      let campaignName = updates.order_status == "packed" ? "packed" : updates.order_status == "out_for_delivery" ? "Out for delivery" : updates.order_status == "delivered" ? "delivered" : "defaultCampaign";
+
       // Prepare Axios data payload
       const apiPayload = {
         apiKey:
           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZWJhODk0YTMzMzVmMGI3MGU5ZjliNCIsIm5hbWUiOiJMb2NhbCBEZWxpdmVyeSA5OSIsImFwcE5hbWUiOiJBaVNlbnN5IiwiY2xpZW50SWQiOiI2NmViYTg5M2EzMzM1ZjBiNzBlOWY5YWQiLCJhY3RpdmVQbGFuIjoiQkFTSUNfTU9OVEhMWSIsImlhdCI6MTczMDAwODQ4NH0.FN2PqWYaoIUVJv3VbhPNkPUj74-9r8k1zYx8zKHLqkM",
-        campaignName: updates.campaignName || "defaultCampaign",
+        campaignName: campaignName || "defaultCampaign",
         destination: order.customer_contact || "919030197878",
         userName: order.customer_name || "Default User",
         templateParams: updates.templateParams || [],
