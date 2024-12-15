@@ -3,6 +3,7 @@
 const jwt = require("jsonwebtoken");
 const Order = require("../models/order");
 const axios = require('axios');
+const appuser = require("../models/appUser");
 
 
 exports.createOrder = async (req, res) => {
@@ -39,6 +40,19 @@ exports.createOrder = async (req, res) => {
         message: "Order has not created someting went wrong",
       });
     }
+
+   let isUser =  await appuser.findOne({ customer_contact: req.body.MobileNumber});
+
+   if(!isUser){
+     await appuser.create({
+       customer_name: req.body.name,
+       customer_email: "johndoe@example.com",
+       customer_contact: req.body.MobileNumber,
+       customer_address: req.body.UserAddress,
+       Join_date: new Date(),
+       is_subscription: false,
+     })
+   }
 
     return res.status(201).send({
       status: true,
