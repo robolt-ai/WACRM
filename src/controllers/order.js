@@ -167,7 +167,7 @@ exports.getOrderDetailsOrUpdate = async (req, res) => {
   try {
     const { type } = req.body;
 
-    if (!type || !['getOrder', 'updateOrder'].includes(type)) {
+    if (!type || !['getOrder'].includes(type)) {
       return res.status(400).send({
         status: false,
         message: "Invalid request type. Must be 'getOrder' or 'updateOrder'.",
