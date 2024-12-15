@@ -165,14 +165,14 @@ exports.deleteOrder = async (req, res) => {
 
 exports.getOrderDetailsOrUpdate = async (req, res) => {
   try {
-    const { type } = req.body;
+    // const { type } = req.body;
 
-    if (!type || !['getOrder'].includes(type)) {
-      return res.status(400).send({
-        status: false,
-        message: "Invalid request type. Must be 'getOrder' or 'updateOrder'.",
-      });
-    }
+    // if (!type || !['getOrder', 'updateOrder'].includes(type)) {
+    //   return res.status(400).send({
+    //     status: false,
+    //     message: "Invalid request type. Must be 'getOrder' or 'updateOrder'.",
+    //   });
+    // }
 
     const orderId = req.params.id;
 
@@ -183,7 +183,7 @@ exports.getOrderDetailsOrUpdate = async (req, res) => {
       });
     }
 
-    if (type === "getOrder") {
+    if (req.body.type == "getOrder") {
       // Fetch order details
       const order = await Order.findOne({ _id: orderId });
       if (!order) {
