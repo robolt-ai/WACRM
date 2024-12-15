@@ -198,7 +198,7 @@ exports.getOrderDetailsOrUpdate = async (req, res) => {
         message: "Order fetched successfully.",
         data: order,
       });
-    } else if (type === "updateOrder") {
+    } else {
       // Update order details
       const updates = req.body;
       const order = await Order.findOneAndUpdate(
