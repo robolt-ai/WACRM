@@ -2,6 +2,8 @@
 
 const jwt = require("jsonwebtoken");
 const Order = require("../models/order");
+const axios = require('axios');
+
 
 exports.createOrder = async (req, res) => {
   try {
@@ -108,51 +110,161 @@ exports.deleteOrder = async (req, res) => {
   }
 };
 
+// exports.getOrderDetailsOrUpdate = async (req, res) => {
+//   try {
+//     // const token =
+//     //   req.body.token ||
+//     //   req.query.token ||
+//     //   (req.headers.authorization && req.headers.authorization.split(" ")[1]);
+
+//     // const { userId } = jwt.verify(token, "jwt_key_!@#$");
+
+//     if (req.body.type == "getOrder") {
+//       let isOrder = await Order.findOne({
+//         _id: req.params.id,
+//       });
+//       if (!isOrder) {
+//         return res.status(404).send({
+//           status: false,
+//           message: "Order not found",
+//         });
+//       }
+
+//       return res.status(200).send({
+//         status: true,
+//         message: "Order has been fetched successfully",
+//         data: isOrder,
+//       });
+//     } else {
+
+      
+//       let isOrder = await Order.findOneAndUpdate(
+//         { _id: req.params.id },
+//         { $set: req.body },
+//         { new: true }
+//       );
+//       if (!isOrder) {
+//         return res.status(404).send({
+//           status: false,
+//           message: "Order not found",
+//         });
+//       }
+
+//       return res.status(200).send({
+//         status: true,
+//         message: "Order has been updated successfully",
+//         data: isOrder,
+//       });
+//     }
+//   } catch (e) {
+//     console.log(e);
+//   }
+// };
+
+
+
 exports.getOrderDetailsOrUpdate = async (req, res) => {
   try {
-    // const token =
-    //   req.body.token ||
-    //   req.query.token ||
-    //   (req.headers.authorization && req.headers.authorization.split(" ")[1]);
+    const { type } = req.body;
 
-    // const { userId } = jwt.verify(token, "jwt_key_!@#$");
-
-    if (req.body.type == "getOrder") {
-      let isOrder = await Order.findOne({
-        _id: req.params.id,
-      });
-      if (!isOrder) {
-        return res.status(404).send({
-          status: false,
-          message: "Order not found",
-        });
-      }
-
-      return res.status(200).send({
-        status: true,
-        message: "Order has been fetched successfully",
-        data: isOrder,
-      });
-    } else {
-      let isOrder = await Order.findOneAndUpdate(
-        { _id: req.params.id },
-        { $set: req.body },
-        { new: true }
-      );
-      if (!isOrder) {
-        return res.status(404).send({
-          status: false,
-          message: "Order not found",
-        });
-      }
-
-      return res.status(200).send({
-        status: true,
-        message: "Order has been updated successfully",
-        data: isOrder,
+    if (!type || !['getOrder', 'updateOrder'].includes(type)) {
+      return res.status(400).send({
+        status: false,
+        message: "Invalid request type. Must be 'getOrder' or 'updateOrder'.",
       });
     }
-  } catch (e) {
-    console.log(e);
+
+    const orderId = req.params.id;
+
+    if (!orderId) {
+      return res.status(400).send({
+        status: false,
+        message: "Order ID is required.",
+      });
+    }
+
+    if (type === "getOrder") {
+      // Fetch order details
+      const order = await Order.findOne({ _id: orderId });
+      if (!order) {
+        return res.status(404).send({
+          status: false,
+          message: "Order not found.",
+        });
+      }
+
+      return res.status(200).send({
+        status: true,
+        message: "Order fetched successfully.",
+        data: order,
+      });
+    } else if (type === "updateOrder") {
+      // Update order details
+      const updates = req.body;
+      const order = await Order.findOneAndUpdate(
+        { _id: orderId },
+        { $set: updates },
+        { new: true }
+      );
+
+      if (!order) {
+        return res.status(404).send({
+          status: false,
+          message: "Order not found.",
+        });
+      }
+
+      // Prepare Axios data payload
+      const apiPayload = {
+        apiKey:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZWJhODk0YTMzMzVmMGI3MGU5ZjliNCIsIm5hbWUiOiJMb2NhbCBEZWxpdmVyeSA5OSIsImFwcE5hbWUiOiJBaVNlbnN5IiwiY2xpZW50SWQiOiI2NmViYTg5M2EzMzM1ZjBiNzBlOWY5YWQiLCJhY3RpdmVQbGFuIjoiQkFTSUNfTU9OVEhMWSIsImlhdCI6MTczMDAwODQ4NH0.FN2PqWYaoIUVJv3VbhPNkPUj74-9r8k1zYx8zKHLqkM",
+        campaignName: updates.campaignName || "defaultCampaign",
+        destination: order.customer_contact || "919030197878",
+        userName: order.customer_name || "Default User",
+        templateParams: updates.templateParams || [],
+        source: updates.source || "API update",
+        media: updates.media || {},
+        buttons: updates.buttons || [],
+        carouselCards: updates.carouselCards || [],
+        location: updates.location || {},
+        paramsFallbackValue: updates.paramsFallbackValue || {},
+      };
+
+      // Make the Axios API call
+      try {
+        const apiResponse = await axios.post(
+          "https://backend.aisensy.com/campaign/t1/api/v2",
+          apiPayload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("External API response:", apiResponse.data);
+      } catch (apiError) {
+        console.error("Error calling external API:", apiError.message);
+        // Optionally, return an error to the client or log for later debugging
+        return res.status(500).send({
+          status: false,
+          message: "Order updated but failed to call external API.",
+          error: apiError.message,
+        });
+      }
+
+      return res.status(200).send({
+        status: true,
+        message: "Order updated successfully and external API notified.",
+        data: order,
+      });
+    }
+  } catch (error) {
+    console.error("Error processing request:", error);
+    return res.status(500).send({
+      status: false,
+      message: "Internal server error.",
+      error: error.message,
+    });
   }
 };
