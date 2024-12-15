@@ -28,6 +28,11 @@ const schema = new mongoose.Schema(
     //   required: true,
       trim: true,
     },
+    order_cart: {
+      type: String,
+    //   required: true,
+      trim: true,
+    },
     order_date: {
       type: String,
     //   required: true,

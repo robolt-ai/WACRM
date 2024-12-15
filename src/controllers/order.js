@@ -24,8 +24,9 @@ exports.createOrder = async (req, res) => {
       customer_contact: req.body.MobileNumber,
       customer_address: req.body.UserAddress,
       order_type: req.body.categoryselect,
+      order_cart: req.body.usercart,
       order_date: new Date(),
-      order_amount: "100.50",
+      order_amount: null,
       order_status: "pending"
     }
     );
