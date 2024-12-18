@@ -113,14 +113,6 @@
   </div>
 
 
-<script>
-  $("#tableGrid2").Grid({
-  className: {
-    table: 'table table-bordered mb-0'
-  },
-  pagination: true
-});
-</script>
 
 
 <script>
@@ -135,104 +127,115 @@
   }
 
   const updateOrderStatus = async (orderId, newStatus) => {
-    try {
-      // Make an API call to update the order status
-      const response = await fetch(`/api/v1/order/get-or-update-order/${orderId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ order_status: newStatus }), // Sending the new status
-      });
+  try {
+    // Make an API call to update the order status
+    const response = await fetch(`/api/v1/order/get-or-update-order/${orderId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ order_status: newStatus }), // Sending the new status
+    });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
 
-        // Update the UI by refreshing the orders list after status update
-        if (data.status) {
-          swal("Success", "Order status updated successfully!", "success");
-          // alert("Order status updated successfully!");
-          expense_category();  // Reload the orders to reflect updated statuses
-        } else {
-          alert("Failed to update status.");
-        }
+      // Update the UI by refreshing the orders list after status update
+      if (data.status) {
+        swal("Success", "Order status updated successfully!", "success");
+        expense_category(); // Reload the orders to reflect updated statuses
       } else {
-        alert("Error updating status: " + response.statusText);
+        alert("Failed to update status.");
       }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred. Please try again later.");
+    } else {
+      alert("Error updating status: " + response.statusText);
     }
-  };
+  } catch (error) {
+    console.error("Error:", error);
+    alert("An error occurred. Please try again later.");
+  }
+};
 
-  const expense_category = async () => {
-    try {
-      const response = await fetch("/api/v1/order/get-order", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+const expense_category = async () => {
+  try {
+    const response = await fetch("/api/v1/order/get-order", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
 
-        if (data.data.length === 0) {
-          return (document.getElementById("display-order-list").innerHTML = `<tr>
-                <td colspan="8">No data available.</td>
-              </tr>`);
-        }
-
-        let res = data.data
-          .map((item, index) => {
-            let statusButton = "";
-
-            // Determine the button based on the current status
-            switch (item.order_status) {
-              case "pending":
-                statusButton = `<button class="btn btn-primary" onclick="updateOrderStatus('${item._id}', 'packed')">Proceed to Packed</button>`;
-                break;
-              case "packed":
-                statusButton = `<button class="btn btn-warning" onclick="updateOrderStatus('${item._id}', 'out_for_delivery')">Proceed to Out for Delivery</button>`;
-                break;
-              case "out_for_delivery":
-                statusButton = `<button class="btn btn-info" onclick="updateOrderStatus('${item._id}', 'delivered')">Proceed to Delivered</button>`;
-                break;
-              case "delivered":
-                statusButton = `<span class="badge bg-success">Completed</span>`;
-                break;
-              default:
-                statusButton = `<span class="badge bg-secondary">Unknown Status</span>`;
-            }
-
-            return `
-              <tr>
-                <th scope="row">#${index + 1}</th>
-                <td>${item.customer_name}</td>
-                <td>${item.customer_contact}</td>
-                <td>${item.order_type}</td>
-                <td>${item.order_cart}</td>
-                <td>${item.order_date}</td>
-                <td>${item.order_status}</td> <!-- Display the order status -->
-                <td>${statusButton}</td> <!-- Show the button based on status -->
-              </tr>
-            `;
-          })
-          .join("");
-
-        document.getElementById("display-order-list").innerHTML = res;
-      } else {
-        alert("Error fetching data: " + response.statusText);
+      if (data.data.length === 0) {
+        return (document.getElementById("display-order-list").innerHTML = `<tr>
+              <td colspan="8">No data available.</td>
+            </tr>`);
       }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred. Please try again later.");
+
+      let res = data.data
+        .map((item, index) => {
+          let statusButton = "";
+
+          const date = new Date(item.order_date);
+          const formattedDate = date.toISOString().split('T')[0]; // Outputs '2024-12-18'
+
+          // Determine the button based on the current status
+          switch (item.order_status) {
+            case "pending":
+              statusButton = `
+                <button class="btn btn-success" onclick="updateOrderStatus('${item._id}', 'order_approved')">Approve Order</button>
+                <button class="btn btn-danger" onclick="updateOrderStatus('${item._id}', 'order_rejected')">Reject Order</button>
+              `;
+              break;
+            case "order_approved":
+              statusButton = `<button class="btn btn-primary" onclick="updateOrderStatus('${item._id}', 'packed')">Proceed to Packed</button>`;
+              break;
+            case "order_rejected":
+              statusButton = `<span class="badge bg-danger">Order Rejected</span>`;
+              break;
+            case "packed":
+              statusButton = `<button class="btn btn-warning" onclick="updateOrderStatus('${item._id}', 'out_for_delivery')">Proceed to Out for Delivery</button>`;
+              break;
+            case "out_for_delivery":
+              statusButton = `<button class="btn btn-info" onclick="updateOrderStatus('${item._id}', 'delivered')">Proceed to Delivered</button>`;
+              break;
+            case "delivered":
+              statusButton = `<span class="badge bg-success">Completed</span>`;
+              break;
+            default:
+              statusButton = `<span class="badge bg-secondary">Unknown Status</span>`;
+          }
+
+          return `
+            <tr>
+              <th scope="row">#${index + 1}</th>
+              <td>${item.customer_name}</td>
+              <td>${item.customer_contact}</td>
+              <td>${item.order_type}</td>
+              <td>${item.order_cart}</td>
+              <td>${formattedDate}</td>
+              <td>${item.order_status}</td> <!-- Display the order status -->
+              <td>${statusButton}</td> <!-- Show the button based on status -->
+            </tr>
+          `;
+        })
+        .join("");
+
+      document.getElementById("display-order-list").innerHTML = res;
+    } else {
+      alert("Error fetching data: " + response.statusText);
     }
-  };
+  } catch (error) {
+    console.error("Error:", error);
+    alert("An error occurred. Please try again later.");
+  }
+};
 
   window.onload = expense_category;
 </script>

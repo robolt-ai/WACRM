@@ -22,35 +22,16 @@
         <table class="table">
           <thead>
             <tr>
+              <th scope="col">Sno</th>
               <th scope="col">User Name</th>
               <th scope="col">User Number</th>
-              <th scope="col">User Email</th>
-              <th scope="col">Address</th>
-              <th scope="col">Type of Subscription</th>
+              <th scope="col">Join Date</th>
+              <th scope="col">Subscription Status</th>
+              
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Imran Ahmed</td>
-              <td>1234567890</td>
-              <td>testmail@mail.com</td>
-              <td>Free</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Aman Sharma</td>
-              <td>1234567890</td>
-              <td>testmail@mail.com</td>
-              <td>Flexi Plan</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Akram</td>
-              <td>1234567890</td>
-              <td>testmail@mail.com</td>
-              <td>Starter pack</td>
-            </tr>
+          <tbody id="display-order-list">
+            
           </tbody>
         </table>
       </div><!-- col -->
@@ -98,13 +79,69 @@
   </div>
 
 
+
 <script>
-  $("#tableGrid2").Grid({
-  className: {
-    table: 'table table-bordered mb-0'
-  },
-  pagination: true
-});
+
+const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1]; // Safe navigation operator in case token doesn't exist
+
+  if (!token) {
+    alert("Token not found. Please login again.");
+    // Redirect to login or handle accordingly
+  }
+
+  const expense_category = async () => {
+    try {
+      const response = await fetch("/api/v1/users/user-list", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+
+        if (data.data.length === 0) {
+          return (document.getElementById("display-order-list").innerHTML = `<tr>
+                <td colspan="8">No data available.</td>
+              </tr>`);
+        }
+
+        let res = data.data
+          .map((item, index) => {
+
+            const date = new Date(item.Join_date);
+            const formattedDate = date.toISOString().split('T')[0]; // Outputs '2024-12-18'
+                 
+            return `
+              <tr>
+                <th scope="row">#${index + 1}</th>
+                <td>${item.customer_name}</td>
+                <td>${item.customer_contact}</td>
+                <td>${formattedDate}</td>
+                <td>${item.is_subscription}</td>
+                
+              </tr>
+            `;
+          })
+          .join("");
+
+        document.getElementById("display-order-list").innerHTML = res;
+      } else {
+        alert("Error fetching data: " + response.statusText);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred. Please try again later.");
+    }
+  };
+
+  window.onload = expense_category;
 </script>
 <!-- Content Wrapper END -->
 <%- include('../partials/footer') %>

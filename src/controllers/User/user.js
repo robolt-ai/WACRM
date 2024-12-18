@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const { sendEmail, sendEmailforget } = require("../../util/sendEmail");
 const jwt = require("jsonwebtoken");
 const userModel = require("../../models/user");
+const appUser = require("../../models/appUser");
 const userSignUp = async function (req, res) {
   try {
     let userEmail = "admin@gmail.com";
@@ -203,24 +204,6 @@ exports.resendVerifyOtpSignUp = async function (req, res) {
     }
 
     // return res.status(200).send({ status: true, message: "User email is verified!" });
-  } catch (err) {
-    res.status(500).send({ status: false, message: err.message });
-  }
-};
-
-exports.userlist = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-
-    let user = await userModel
-      .find()
-      .skip((page - 1) * limit)
-      .limit(limit);
-
-    if (user) {
-      return res.status(200).send({ status: true, data: user });
-    }
   } catch (err) {
     res.status(500).send({ status: false, message: err.message });
   }
@@ -453,5 +436,24 @@ exports.changePassword = async function (req, res) {
     });
   } catch (error) {
     return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+
+exports.userlist = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    let user = await appUser
+      .find()
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    if (user) {
+      return res.status(200).send({ status: true, data: user });
+    }
+  } catch (err) {
+    res.status(500).send({ status: false, message: err.message });
   }
 };
