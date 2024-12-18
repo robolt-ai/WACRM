@@ -288,24 +288,48 @@ exports.getOrderDetailsOrUpdate = async (req, res) => {
       console.log(campaignName)
 
       function generateRandom8DigitNumber() {
-        return Math.floor(10000000 + Math.random() * 90000000);
-    }
+        let randomNumber = Math.floor(10000000 + Math.random() * 90000000);
+          return randomNumber.toString(); // Converts number to string explicitly
+      }
+  
+    
 
+    let apiPayload;
+
+      if(campaignName == "order approved"){
+        apiPayload = {
+          apiKey:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZWJhODk0YTMzMzVmMGI3MGU5ZjliNCIsIm5hbWUiOiJMb2NhbCBEZWxpdmVyeSA5OSIsImFwcE5hbWUiOiJBaVNlbnN5IiwiY2xpZW50SWQiOiI2NmViYTg5M2EzMzM1ZjBiNzBlOWY5YWQiLCJhY3RpdmVQbGFuIjoiQkFTSUNfTU9OVEhMWSIsImlhdCI6MTczMDAwODQ4NH0.FN2PqWYaoIUVJv3VbhPNkPUj74-9r8k1zYx8zKHLqkM",
+          campaignName: campaignName || "defaultCampaign",
+          destination: order.customer_contact || "919030197878",
+          userName: order.customer_name || "Default User",
+          templateParams: [ generateRandom8DigitNumber()
+          ] || [],
+          source: updates.source || "API update",
+          media: updates.media || {},
+          buttons: updates.buttons || [],
+          carouselCards: updates.carouselCards || [],
+          location: updates.location || {},
+          paramsFallbackValue: updates.paramsFallbackValue || { "FirstName": "user"
+          },
+        };
+      }else{
       // Prepare Axios data payload
-      const apiPayload = {
-        apiKey:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZWJhODk0YTMzMzVmMGI3MGU5ZjliNCIsIm5hbWUiOiJMb2NhbCBEZWxpdmVyeSA5OSIsImFwcE5hbWUiOiJBaVNlbnN5IiwiY2xpZW50SWQiOiI2NmViYTg5M2EzMzM1ZjBiNzBlOWY5YWQiLCJhY3RpdmVQbGFuIjoiQkFTSUNfTU9OVEhMWSIsImlhdCI6MTczMDAwODQ4NH0.FN2PqWYaoIUVJv3VbhPNkPUj74-9r8k1zYx8zKHLqkM",
-        campaignName: campaignName || "defaultCampaign",
-        destination: order.customer_contact || "919030197878",
-        userName: order.customer_name || "Default User",
-        templateParams: updates.templateParams || [generateRandom8DigitNumber()],
-        source: updates.source || "API update",
-        media: updates.media || {},
-        buttons: updates.buttons || [],
-        carouselCards: updates.carouselCards || [],
-        location: updates.location || {},
-        paramsFallbackValue: updates.paramsFallbackValue || {},
-      };
+        apiPayload = {
+          apiKey:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZWJhODk0YTMzMzVmMGI3MGU5ZjliNCIsIm5hbWUiOiJMb2NhbCBEZWxpdmVyeSA5OSIsImFwcE5hbWUiOiJBaVNlbnN5IiwiY2xpZW50SWQiOiI2NmViYTg5M2EzMzM1ZjBiNzBlOWY5YWQiLCJhY3RpdmVQbGFuIjoiQkFTSUNfTU9OVEhMWSIsImlhdCI6MTczMDAwODQ4NH0.FN2PqWYaoIUVJv3VbhPNkPUj74-9r8k1zYx8zKHLqkM",
+          campaignName: campaignName || "defaultCampaign",
+          destination: order.customer_contact || "919030197878",
+          userName: order.customer_name || "Default User",
+          templateParams: updates.templateParams || [],
+          source: updates.source || "API update",
+          media: updates.media || {},
+          buttons: updates.buttons || [],
+          carouselCards: updates.carouselCards || [],
+          location: updates.location || {},
+          paramsFallbackValue: updates.paramsFallbackValue || {},
+        };
+      }
 
       // Make the Axios API call
       try {
