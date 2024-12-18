@@ -32,13 +32,16 @@ exports.createOrder = async (req, res) => {
       campaignName: "Subscription limit reached",
       destination: isUser.customer_contact || "919030197878",
       userName: isUser.customer_name || "Default User",
-      templateParams: isUser.templateParams || [],
+      templateParams: isUser.templateParams || [   "$FirstName",
+        "$FirstName"
+    ],
       source: isUser.source || "API update",
       media: isUser.media || {},
       buttons: isUser.buttons || [],
       carouselCards: isUser.carouselCards || [],
       location: isUser.location || {},
-      paramsFallbackValue: isUser.paramsFallbackValue || {},
+      paramsFallbackValue: isUser.paramsFallbackValue || { "FirstName": "user"
+      },
     };
 
     // Make the Axios API call
