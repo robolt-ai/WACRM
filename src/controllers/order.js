@@ -287,6 +287,10 @@ exports.getOrderDetailsOrUpdate = async (req, res) => {
 
       console.log(campaignName)
 
+      function generateRandom8DigitNumber() {
+        return Math.floor(10000000 + Math.random() * 90000000);
+    }
+
       // Prepare Axios data payload
       const apiPayload = {
         apiKey:
@@ -294,7 +298,7 @@ exports.getOrderDetailsOrUpdate = async (req, res) => {
         campaignName: campaignName || "defaultCampaign",
         destination: order.customer_contact || "919030197878",
         userName: order.customer_name || "Default User",
-        templateParams: updates.templateParams || [],
+        templateParams: updates.templateParams || [generateRandom8DigitNumber()],
         source: updates.source || "API update",
         media: updates.media || {},
         buttons: updates.buttons || [],
