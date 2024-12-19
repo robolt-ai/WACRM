@@ -24,7 +24,9 @@ exports.createOrder = async (req, res) => {
 
    let isOrderLimit = await Order.find({customer_contact: req.body.MobileNumber});
 
-   if(isOrderLimit > 2 && isUser.is_subscription == false){
+   
+
+   if(isOrderLimit.length > 2 && isUser.is_subscription == false){
 
     const apiPayload = {
       apiKey:
@@ -32,7 +34,7 @@ exports.createOrder = async (req, res) => {
       campaignName: "Subscription limit reached",
       destination: isUser.customer_contact || "919030197878",
       userName: isUser.customer_name || "Default User",
-      templateParams: isUser.templateParams || [   "$FirstName",
+      templateParams: [   "$FirstName",
         "$FirstName"
     ],
       source: isUser.source || "API update",
@@ -40,7 +42,7 @@ exports.createOrder = async (req, res) => {
       buttons: isUser.buttons || [],
       carouselCards: isUser.carouselCards || [],
       location: isUser.location || {},
-      paramsFallbackValue: isUser.paramsFallbackValue || { "FirstName": "user"
+      paramsFallbackValue:  { "FirstName": "user"
       },
     };
 
