@@ -27,6 +27,7 @@
               <th scope="col">User Number</th>
               <th scope="col">Join Date</th>
               <th scope="col">Subscription Status</th>
+              <th scope="col">Add Subscription</th>
               
             </tr>
           </thead>
@@ -124,8 +125,8 @@ const token = document.cookie
                 <td>${item.customer_name}</td>
                 <td>${item.customer_contact}</td>
                 <td>${formattedDate}</td>
-                <td>${item.is_subscription}</td>
-                 <td><button class="btn btn-info btn-sm ml-2" onclick="viewOrderCart('${item._id}')">Active </button></td>
+                <td>${item.is_subscription ? "Pro" : "Normal"}</td>
+                <td>${item.is_subscription ? `<button class="btn btn-success btn-sm ml-2" onclick="viewOrderCart('${item._id}')">View </button>` : `<button class="btn btn-warning btn-sm ml-2" onclick="viewOrderCart('${item._id}')">Add </button>`}</td>
               </tr>
             `;
           })

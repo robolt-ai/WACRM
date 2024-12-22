@@ -123,7 +123,7 @@ exports.createOrder = async (req, res) => {
 exports.getOrder = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 15;
 
     // If order_status is provided in the query, filter by it; otherwise, return all orders
     const filter = req.query.order_status ? { order_status: req.query.order_status } : {};
