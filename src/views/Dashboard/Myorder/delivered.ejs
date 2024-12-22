@@ -1,0 +1,432 @@
+<%- include('../../partials/header.ejs') %>
+
+  <div class="main main-app p-3 p-lg-4">
+    <!-- <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h4 class="main-title mb-0">Orders</h4>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+          Order Status
+        </button>
+        <ul class="dropdown-menu shadow" aria-labelledby="dropdownMenuButton1">
+          <li><a class="dropdown-item" href="#">🔴 Pending</a></li>
+          <li><a class="dropdown-item" href="#">📦 Packed</a></li>
+          <li><a class="dropdown-item" href="#">🚚 Out for delivery</a></li>
+          <li><a class="dropdown-item" href="#">🟢 Delivered</a></li>
+        </ul>
+      </div>
+    </div> -->
+
+    <div class="row g-3">
+      <div class="col-12 col-xl-12">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Order ID</th>
+              <th scope="col">Customer name</th>
+              <th scope="col">Customer number</th>
+              <th scope="col">Type of order</th>
+              <th scope="col">Order details</th>
+              <th scope="col">Order date</th>
+              <th scope="col">Order status</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody id="display-order-list">
+            <!-- <tr>
+              <th scope="row">55896</th>
+              <td>Aman sharma</td>
+              <td>1234567890</td>
+              <td>Grocery</td>
+              <td>View Button</td>
+              <td>🚚 Out for delivery</td>
+            </tr>
+            <tr>
+              <th scope="row">55842</th>
+              <td>Imran Ahmed</td>
+              <td>1234567890</td>
+              <td>Grocery</td>
+              <td>View Button</td>
+              <td>📦 Packed</td>
+            </tr>
+            <tr>
+              <th scope="row">35682</th>
+              <td>Akram</td>
+              <td>1234567890</td>
+              <td>Beverages</td>
+              <td>View Button</td>
+              <td>🔴 Pending</td>
+            </tr>
+            <tr>
+              <th scope="row">35682</th>
+              <td>User 4</td>
+              <td>1234567890</td>
+              <td>Medicines</td>
+              <td>View Button</td>
+              <td>🟢 Delivered</td>
+            </tr> -->
+          </tbody>
+        </table>
+      </div><!-- col -->
+    </div><!-- row -->
+  </div><!-- main -->
+
+
+  <div class="modal fade" id="modal2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modal2Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal2Label">Order Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div><!-- modal-header -->
+        <div class="modal-body">
+          <div class="card-body">
+            <div id="orderCartContent"></div>            
+          </div><!-- card-body -->
+        </div><!-- modal-body -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+         
+        </div><!-- modal-footer -->
+      </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
+  </div><!-- modal -->
+
+  </div>
+
+
+
+
+<script>
+  const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1]; // Safe navigation operator in case token doesn't exist
+
+  if (!token) {
+    alert("Token not found. Please login again.");
+    // Redirect to login or handle accordingly
+  }
+
+  const updateOrderStatus = async (orderId, newStatus) => {
+  try {
+    // Make an API call to update the order status
+    const response = await fetch(`/api/v1/order/get-or-update-order/${orderId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ order_status: newStatus }), // Sending the new status
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+
+      // Update the UI by refreshing the orders list after status update
+      if (data.status) {
+        swal("Success", "Order status updated successfully!", "success");
+        expense_category(); // Reload the orders to reflect updated statuses
+      } else {
+        alert("Failed to update status.");
+      }
+    } else {
+      alert("Error updating status: " + response.statusText);
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("An error occurred. Please try again later.");
+  }
+};
+
+const expense_category = async () => {
+  try {
+    const response = await fetch("/api/v1/order/get-order?order_status=delivered", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+
+      if (data.data.length === 0) {
+        return (document.getElementById("display-order-list").innerHTML = `<tr>
+              <td colspan="8">No data available.</td>
+            </tr>`);
+      }
+
+      let res = data.data
+        .map((item, index) => {
+          let statusButton = "";
+
+          const date = new Date(item.order_date);
+          const formattedDate = date.toISOString().split('T')[0]; // Outputs '2024-12-18'
+
+          // Determine the button based on the current status
+          switch (item.order_status) {
+            case "pending":
+              statusButton = `
+                <button class="btn btn-success" onclick="updateOrderStatus('${item._id}', 'order_approved')">Approve Order</button>
+                <button class="btn btn-danger" onclick="updateOrderStatus('${item._id}', 'order_rejected')">Reject Order</button>
+              `;
+              break;
+            case "order_approved":
+              statusButton = `<button class="btn btn-primary" onclick="updateOrderStatus('${item._id}', 'packed')">Proceed to Packed</button>`;
+              break;
+            case "order_rejected":
+              statusButton = `<span class="badge bg-danger">Order Rejected</span>`;
+              break;
+            case "packed":
+              statusButton = `<button class="btn btn-warning" onclick="updateOrderStatus('${item._id}', 'out_for_delivery')">Proceed to Out for Delivery</button>`;
+              break;
+            case "out_for_delivery":
+              statusButton = `<button class="btn btn-info" onclick="updateOrderStatus('${item._id}', 'delivered')">Proceed to Delivered</button>`;
+              break;
+            case "delivered":
+              statusButton = `<span class="badge bg-success">Completed</span>`;
+              break;
+            default:
+              statusButton = `<span class="badge bg-secondary">Unknown Status</span>`;
+          }
+
+          return `
+            <tr>
+              <th scope="row">#${index + 1}</th>
+              <td>${item.customer_name}</td>
+              <td>${item.customer_contact}</td>
+              <td>${item.order_type}</td>
+              <td><button class="btn btn-info btn-sm ml-2" onclick="viewOrderCart('${item.order_cart}')">View</button></td>
+              <td>${formattedDate}</td>
+              <td>${item.order_status}</td> <!-- Display the order status -->
+              <td>${statusButton}</td> <!-- Show the button based on status -->
+            </tr>
+          `;
+        })
+        .join("");
+
+      document.getElementById("display-order-list").innerHTML = res;
+    } else {
+      alert("Error fetching data: " + response.statusText);
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("An error occurred. Please try again later.");
+  }
+};
+
+
+function viewOrderCart(orderCart) {
+  // Populate the modal content with the order_cart details
+  document.getElementById('orderCartContent').innerHTML = `
+    <pre>${orderCart}</pre>
+  `;
+  
+  // Open the modal using Bootstrap's JavaScript API
+  var myModal = new bootstrap.Modal(document.getElementById('modal2'));
+  myModal.show();
+}
+
+  window.onload = expense_category;
+</script>
+
+  
+  <!-- delete expense -->
+  <script>
+  async function deleteExpenseCategory(id){
+  try {
+  const token = document.cookie
+  .split('; ')
+  .find((row) => row.startsWith('token='))
+  .split('=')[1];
+  
+  const response = await swal({
+  title: 'Are you sure you want to delete?',
+  text: 'This action cannot be undone.',
+  icon: 'warning',
+  buttons: ['Cancel', 'Delete'],
+  dangerMode: true,
+  });
+  
+  if (response) {
+  if (response) {
+  const deleteResponse = await fetch(`/api/v1/order/delete-order/${id}`, {
+  method: 'DELETE',
+  headers: {
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${token}`,
+  },
+  });
+  
+  const data = await deleteResponse.json();
+  if (deleteResponse.ok) {
+  swal({
+      title: 'Deleted!',
+      text: `${data.message}`,
+      icon: 'success',
+      }).then(() => {
+        // Automatically trigger the "Close" button click event to close the modal
+        // document.getElementById("closeModalButton").click();
+        expense_category();
+      });
+  
+  } else {
+  // Handle deletion error
+  swal('Error', `${data.message}`, 'error');
+  }
+  }
+  }
+  } catch (error) {
+  console.error('Error:', error);
+  }
+  }
+  </script>
+  
+  <!-- create order -->
+  <script>
+    let form;
+  form = document.getElementById("order-form")
+  
+  submitButton = form.querySelector('button[type="submit"]')
+  errorMessage = form.querySelector(".error-message")
+  
+  
+  
+  
+  form.addEventListener("submit", async (e) => {
+  e.preventDefault() // Prevent the form from submitting
+  submitButton.disabled = true // Disable the submit button
+  submitButton.textContent = "Loading..." // Change the text of the submit button to "Loading..."
+  const category_name = document.getElementById("category_name").value.trim()
+  
+  console.log(form)
+  
+  // Make the API call to login
+  const response = await fetch("/api/v1/order/create-order", {
+  method: "POST",
+  headers: {
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify({
+  category_name,
+  
+  
+  }),
+  })
+  
+  submitButton.disabled = false // Enable the submit button
+  submitButton.textContent = "Submit" // Change the text of the submit button back to "Submit"
+  
+  if (response.ok) {
+  // Handle successful login
+  const data = await response.json()
+  // Redirect to the home page
+  swal({
+      title: 'Submited!',
+      text: `${data.message}`,
+      icon: 'success',
+      }).then(() => {
+        // Automatically trigger the "Close" button click event to close the modal
+        // document.getElementById("closeModalButton").click();
+        // expense_category();
+      });
+  } else {
+  // Handle failed registration
+  const errorData = await response.json()
+  console.log(errorData)
+  errorMessage.textContent = errorData.message
+  }
+  })
+  </script>
+  
+  
+  <script>
+    let ex_category_id;
+    async function getExpenseCategoryDetails(id){
+    try {
+        ex_category_id = id
+    const token = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('token='))
+    .split('=')[1];
+  
+    const response = await fetch(`/api/v1/expense-order/get-or-update-expense-order/${id}`, {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+        category_type:"getCategory",
+        }),
+    });
+  
+    if (response.ok) {
+    // Handle successful login
+    const data = await response.json();
+    console.log(data)
+    document.getElementById("up_ex_category_name").value = data.data.category_name
+  
+    } else {
+    // Handle login error
+    swal('Error', 'Failed to get the order.', 'error');
+    }
+    } catch (error) {
+    console.error('Error:', error);
+    }
+    }
+  
+  
+  </script>
+  <!-- update-order -->
+  <script>
+      async function updateExpenseCategoryPost(){
+      // const userName = form.userName.value
+      const category_name = document.getElementById("up_category_name").value.trim()
+      // Make the API call to login
+      const response = await fetch(`/api/v1/expense-order/get-or-update-expense-order/${ex_category_id}`, {
+      method: "POST",
+      headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+          category_type:"updated",
+          category_name,
+  
+      }),
+      })
+  
+      if (response.ok) {
+      // Handle successful login
+      const data = await response.json()
+  
+      swal({
+      title: 'Updated!',
+      text: `${data.message}`,
+      icon: 'success',
+      }).then(() => {
+        // Automatically trigger the "Close" button click event to close the modal
+        document.getElementById("editCloseModalButton").click();
+        expense_category();
+      });
+  
+      } else {
+      // Handle failed registration
+      const errorData = await response.json()
+      console.log(errorData)
+      errorMessage.textContent = errorData.message
+      }
+      }
+  </script>
+
+
+<!-- Content Wrapper END -->
+<%- include('../../partials/footer') %>
+</html>

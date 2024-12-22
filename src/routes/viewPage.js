@@ -84,6 +84,22 @@ module.exports = function (viewPage) {
     res.render("Dashboard/category");
   });
 
+  viewPage.get("/pending", isUserAllowed, function (req, res) {
+    res.render("Dashboard/Myorder/pending");
+  });
+  viewPage.get("/packed", isUserAllowed, function (req, res) {
+    res.render("Dashboard/Myorder/packed");
+  });
+  viewPage.get("/out_for_delivery", isUserAllowed, function (req, res) {
+    res.render("Dashboard/Myorder/out_for_delivery");
+  });
+  viewPage.get("/delivered", isUserAllowed, function (req, res) {
+    res.render("Dashboard/Myorder/delivered");
+  });
+  viewPage.get("/rejected_order", isUserAllowed, function (req, res) {
+    res.render("Dashboard/Myorder/rejectedOrder");
+  });
+
 
   /////////////////////////////////////////////////////////
 

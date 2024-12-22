@@ -128,7 +128,7 @@ exports.getOrder = async (req, res) => {
 
     
     let allCategory = await Order
-    .find()
+    .find({order_status: req.query.order_status})
     .skip((page - 1) * limit)
     .limit(limit).sort({ createdAt: -1 });
 
