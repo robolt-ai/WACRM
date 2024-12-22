@@ -5,17 +5,7 @@
       <div>
         <h4 class="main-title mb-0">Orders</h4>
       </div>
-      <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-          Order Status
-        </button>
-        <ul class="dropdown-menu shadow" aria-labelledby="dropdownMenuButton1">
-          <li><a class="dropdown-item" href="#">🔴 Pending</a></li>
-          <li><a class="dropdown-item" href="#">📦 Packed</a></li>
-          <li><a class="dropdown-item" href="#">🚚 Out for delivery</a></li>
-          <li><a class="dropdown-item" href="#">🟢 Delivered</a></li>
-        </ul>
-      </div>
+     
     </div>
 
     <div class="row g-3">
@@ -34,38 +24,6 @@
             </tr>
           </thead>
           <tbody id="display-order-list">
-            <!-- <tr>
-              <th scope="row">55896</th>
-              <td>Aman sharma</td>
-              <td>1234567890</td>
-              <td>Grocery</td>
-              <td>View Button</td>
-              <td>🚚 Out for delivery</td>
-            </tr>
-            <tr>
-              <th scope="row">55842</th>
-              <td>Imran Ahmed</td>
-              <td>1234567890</td>
-              <td>Grocery</td>
-              <td>View Button</td>
-              <td>📦 Packed</td>
-            </tr>
-            <tr>
-              <th scope="row">35682</th>
-              <td>Akram</td>
-              <td>1234567890</td>
-              <td>Beverages</td>
-              <td>View Button</td>
-              <td>🔴 Pending</td>
-            </tr>
-            <tr>
-              <th scope="row">35682</th>
-              <td>User 4</td>
-              <td>1234567890</td>
-              <td>Medicines</td>
-              <td>View Button</td>
-              <td>🟢 Delivered</td>
-            </tr> -->
           </tbody>
         </table>
       </div><!-- col -->
@@ -73,42 +31,26 @@
   </div><!-- main -->
 
 
-  <div class="modal fade" id="modal2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="modal2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modal2Label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Create new subscription</h5>
+          <h5 class="modal-title" id="modal2Label">Order Details</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div><!-- modal-header -->
         <div class="modal-body">
           <div class="card-body">
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">Subscription name</label>
-              <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Enter subscription name">
-            </div>
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">Max accepted orders per day</label>
-              <input type="number" class="form-control" id="exampleFormControlInput1" placeholder="Maximum orders a user can place in a day">
-            </div>
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">Subscription validity</label>
-              <input type="number" class="form-control" id="exampleFormControlInput1" placeholder="Enter subscription validity in days">
-            </div>
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">Subscription price</label>
-              <input type="number" class="form-control" id="exampleFormControlInput1" placeholder="Enter subscription price">
-            </div>
-            
-            
+            <div id="orderCartContent"></div>            
           </div><!-- card-body -->
         </div><!-- modal-body -->
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Submit</button>
+         
         </div><!-- modal-footer -->
       </div><!-- modal-content -->
-    </div><!-- modal-content -->
+    </div><!-- modal-dialog -->
   </div><!-- modal -->
+
 
   </div>
 
@@ -218,7 +160,7 @@ const expense_category = async () => {
               <td>${item.customer_name}</td>
               <td>${item.customer_contact}</td>
               <td>${item.order_type}</td>
-              <td>${item.order_cart}</td>
+              <td><button class="btn btn-info btn-sm ml-2" onclick="viewOrderCart('${item.order_cart}')">View</button></td>
               <td>${formattedDate}</td>
               <td>${item.order_status}</td> <!-- Display the order status -->
               <td>${statusButton}</td> <!-- Show the button based on status -->
@@ -236,6 +178,18 @@ const expense_category = async () => {
     alert("An error occurred. Please try again later.");
   }
 };
+
+
+function viewOrderCart(orderCart) {
+  // Populate the modal content with the order_cart details
+  document.getElementById('orderCartContent').innerHTML = `
+    <pre>${orderCart}</pre>
+  `;
+  
+  // Open the modal using Bootstrap's JavaScript API
+  var myModal = new bootstrap.Modal(document.getElementById('modal2'));
+  myModal.show();
+}
 
   window.onload = expense_category;
 </script>

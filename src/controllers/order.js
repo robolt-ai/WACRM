@@ -122,33 +122,42 @@ exports.createOrder = async (req, res) => {
 
 exports.getOrder = async (req, res) => {
   try {
-    
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
-    
-    let allCategory = await Order
-    .find({order_status: req.query.order_status})
-    .skip((page - 1) * limit)
-    .limit(limit).sort({ createdAt: -1 });
+    // If order_status is provided in the query, filter by it; otherwise, return all orders
+    const filter = req.query.order_status ? { order_status: req.query.order_status } : {};
 
-    if (!allCategory) {
+    // Fetch orders with pagination, and optional filtering by order_status
+    let allCategory = await Order
+      .find(filter)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    // If no orders are found
+    if (!allCategory || allCategory.length === 0) {
       return res.status(404).send({
         status: false,
-        message: "Order not found",
+        message: "No orders found",
       });
     }
 
-
+    // Return the fetched orders
     return res.status(200).send({
       status: true,
-      message: "Order has been fetched successfully",
+      message: "Orders have been fetched successfully",
       data: allCategory,
     });
   } catch (e) {
     console.log(e);
+    return res.status(500).send({
+      status: false,
+      message: "An error occurred while fetching orders",
+    });
   }
 };
+
 
 
 exports.deleteOrder = async (req, res) => {

@@ -125,7 +125,7 @@ const token = document.cookie
                 <td>${item.customer_contact}</td>
                 <td>${formattedDate}</td>
                 <td>${item.is_subscription}</td>
-                
+                 <td><button class="btn btn-info btn-sm ml-2" onclick="viewOrderCart('${item._id}')">Active </button></td>
               </tr>
             `;
           })
