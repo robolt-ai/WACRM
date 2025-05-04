@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 // MongoDB connection URL
-const dbUrl = `mongodb+srv://thinkinternet2020:FlrUonevplMlfTXx@cluster0.bgydh5k.mongodb.net/WACRM?retryWrites=true&w=majority`;
+const dbUrl = `#mongoURL Here`;
 
 mongoose.set("strictQuery", true);
 
